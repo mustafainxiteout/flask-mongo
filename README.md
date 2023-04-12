@@ -52,6 +52,7 @@ This application includes the following features:
 - MongoDB integration for data storage
 - Flask-RESTX for building a RESTful API
 - CRUD operations for managing data
+- User Authentication and Hashing Password through Restful API
 
 ## File Structure
 The file structure of this application is as follows:
@@ -73,3 +74,12 @@ The file structure of this application is as follows:
 - `application/__init__.py` contains the configuration for Flask.
 - `application/models.py` contains the MongoDB models for the application.
 - `application/routes.py` contains the Flask and RESTful API routes.
+
+```
+└── mongodb_files
+     ├── courses.json
+     └── users.json
+```
+
+- `courses.json` contains courses data to import in mongodb
+- `users.json` contains users data to import in mongodb and password of it is hashed and stored in it. For the attached one, The password is `12345678`.
