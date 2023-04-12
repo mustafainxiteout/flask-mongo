@@ -1,5 +1,18 @@
 import flask
 from application import db
+from werkzeug.security import generate_password_hash, check_password_hash
+
+class users(db.Document):
+    user_id=db.IntField(unique=True)
+    name=db.StringField(max_length=50)
+    email=db.StringField(max_length=50,unique=True)
+    password=db.StringField()
+
+    def set_password(self, password):
+        self.password=generate_password_hash(method='pbkdf2:sha512:150000',password=password)
+    
+    def get_password(self,password):
+        return check_password_hash(self.password, password)
     
 class courses(db.Document):
     courseID=db.StringField(unique=True)
