@@ -20,7 +20,7 @@ Follow these steps to get started with the application:
 1. Clone the repository (if you haven't already):
 
 ```
-  git clone https://github.com/<username>/<repository>.git
+  git clone https://github.com/mustafainxiteout/flask-mongo.git
 ```
 
 2. Create and activate a virtual environment:
