@@ -44,7 +44,6 @@ flask run
 
 5. Open the application in your browser at http://localhost:8000.
 
-Takes two numbers and returns the sum.
 
 
 ## Features
