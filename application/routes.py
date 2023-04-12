@@ -1,14 +1,15 @@
 #Importing necessary libraries
-from application import app,db,api
+from application import app,db,api,jwt
 from flask import render_template, jsonify, json
 from application.models import users,courses
 from flask_restx import Resource
+from flask_jwt_extended import create_access_token,jwt_required
 
 #Creating a namespace for our API
 ns = api.namespace('api', description='My API')
 
 @ns.route('/users')
-class GetAndPost(Resource):
+class GetAndPostUser(Resource):
     def get(self):
         # Get all users and exclude password field
         return jsonify(users.objects.exclude('password'))
@@ -26,7 +27,7 @@ class GetAndPost(Resource):
         return jsonify(users.objects(user_id=userid))
     
 @ns.route('/users/<idx>')
-class GetUpdateDelete(Resource):
+class GetUpdateDeleteUser(Resource):
     def get(self,idx):
         # Get user object by user_id and exclude password field
         user = users.objects.exclude('password').get(user_id=idx)
@@ -64,7 +65,7 @@ class GetUpdateDelete(Resource):
             return jsonify("User is deleted!")
     
 @ns.route('/users/<idx>/updatepassword')
-class Update(Resource):
+class UpdateUserpassword(Resource):
     def put(self,idx):
         # Get request data from payload
         data=api.payload
@@ -80,6 +81,29 @@ class Update(Resource):
         user.save()
         
         return {'message': 'User password updated successfully'}, 200
+    
+@ns.route('/login')
+class Login(Resource):
+    def post(self):
+        # Get request data from payload
+        data=api.payload
+        user=users.objects(email=data['email']).first()
+        
+        if not user or not user.get_password(data['password']):
+            return {'message': 'Invalid credentials'}, 401
+        
+        else:
+            # Create access token for user
+            access_token = create_access_token(identity=str(user.user_id))
+            return {'access_token': access_token}, 200
+
+@ns.route('/signout')
+class SignOut(Resource):
+    @jwt_required() # add this if you're using JWT for authentication
+    def post(self):
+        # Delete access token from client-side
+        # Return success message
+        return {'message': 'Logged out successfully'}, 200
 
 
 #Defining endpoints for getting and posting courses
