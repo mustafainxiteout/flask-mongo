@@ -27,7 +27,7 @@ Follow these steps to get started with the application:
 
 ```
   python3 -m venv venv
-  source venv/bin/activate
+  venv\Scripts\activate
 ```
 
 3. Install the required packages using pip:
