@@ -1,0 +1,9 @@
+[{
+  "_id": {
+    "$oid": "64365701f8440c465757ae22"
+  },
+  "user_id": 1,
+  "name": "mohammed mustafa",
+  "email": "iammustafatz26@gmail.com",
+  "password": "pbkdf2:sha512:150000$HwhhDzbBJxkRMv8n$355aeb17a1599f95e7873e9ed031a2e72c8101d2c503c809a967316bfb518d24ef9b1432f8decdf993bff51f5e6ddf6cdeca0dbacff3cb823a0b33bb769db494"
+}]
