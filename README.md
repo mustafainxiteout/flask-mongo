@@ -21,7 +21,6 @@ Follow these steps to get started with the application:
 
 ```
   git clone https://github.com/<username>/<repository>.git
-
 ```
 
 2. Create and activate a virtual environment:
@@ -29,21 +28,18 @@ Follow these steps to get started with the application:
 ```
   python3 -m venv venv
   source venv/bin/activate
-
 ```
 
 3. Install the required packages using pip:
 
 ```
 pip install -r requirements.txt
-
 ```
 
 4. Start the Flask application:
 
 ```
 flask run
-
 ```
 
 5. Open the application in your browser at http://localhost:8000.
@@ -69,8 +65,7 @@ The file structure of this application is as follows:
     ├── templates
     ├── __init__.py
     ├── models.py
-    └── routes.py
-    
+    └── routes.py    
 ```
 
 - `app.py` calls the main Flask application.
