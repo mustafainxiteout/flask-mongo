@@ -8,9 +8,9 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from flask_jwt_extended import create_access_token,jwt_required,get_jwt
 
 #Creating a namespace for our API
-ns = api.namespace('api', description='My API')
+ns = api.namespace('users', description='Users')
 
-@ns.route('/users')
+@ns.route('')
 class GetAndPostUser(Resource):
     def get(self):
         # Get all users and exclude password field
@@ -43,7 +43,7 @@ class GetAndPostUser(Resource):
             return {'message': 'Error occured'}, 401
 
     
-@ns.route('/users/<idx>')
+@ns.route('/<idx>')
 class GetUpdateDeleteUser(Resource):
     def get(self,idx):
         # Get user object by user_id and exclude password field
@@ -85,7 +85,7 @@ class GetUpdateDeleteUser(Resource):
             user.delete()
             return jsonify("User is deleted!")
     
-@ns.route('/users/<idx>/updatepassword')
+@ns.route('/<idx>/updatepassword')
 class UpdateUserpassword(Resource):
     def put(self,idx):
         # Get request data from payload
@@ -106,7 +106,7 @@ class UpdateUserpassword(Resource):
         
         return {'message': 'User password updated successfully'}, 200
     
-@ns.route('/users/reverify')
+@ns.route('/reverify')
 class Reverify(Resource):
     def post(self):
         # Get request data from payload
@@ -171,9 +171,11 @@ class SignOut(Resource):
         # Return success message
         return {'message': 'Logged out successfully'}, 200
 
+#Creating a namespace for our API
+ns2 = api.namespace('courses', description='Courses')
 
 #Defining endpoints for getting and posting courses
-@ns.route('/courses')
+@ns2.route('')
 class GetAndPost(Resource):
     def get(self):
         return jsonify(courses.objects.all())
@@ -185,7 +187,7 @@ class GetAndPost(Resource):
         return jsonify(courses.objects(courseID=data['courseID']))
 
 #Defining endpoints for getting, updating and deleting courses by ID
-@ns.route('/courses/<idx>')
+@ns2.route('/<idx>')
 class GetUpdateDelete(Resource):
     def get(self,idx):
         return jsonify(courses.objects(courseID=idx))
