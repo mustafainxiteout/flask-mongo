@@ -8,7 +8,7 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from flask_jwt_extended import create_access_token,jwt_required,get_jwt
 
 #Creating a namespace for our API
-ns = api.namespace('users', description='Users')
+ns = api.namespace('users', description='The users namespace contains endpoints for managing user data. This includes creating, retrieving, updating, and deleting user accounts, as well as managing user authentication and authorization.')
 
 # Define the expected payload using the 'fields' module
 user_model = ns.model('User', {
@@ -40,17 +40,16 @@ reverify_model = ns.model('Reverify', {
     'email': fields.String(required=True, description='enter your email id')
 })
 
-course_model = ns.model('Course', {
-    'courseID': fields.String(required=True, description='enter your courseID'),
-    'title': fields.String(required=True, description='enter your title'),
-    'description': fields.String(required=True, description='enter your description'),
-    'credits': fields.Integer(required=True, description='enter your credits'),
-    'term': fields.String(required=True, description='enter your term')
-})
+
+# Define the authorization header model
+auth_header = api.parser()
+auth_header.add_argument('Authorization', type=str, location='headers', required=True, help='Bearer Access Token')
 
 
 @ns.route('')
 class GetAndPostUser(Resource):
+    @ns.doc(security='Bearer Auth', parser=auth_header)
+    @jwt_required() # add this if you're using JWT for authentication
     def get(self):
         # Get all users and exclude password field
         return jsonify(users.objects.exclude('password','verified'))
@@ -87,6 +86,8 @@ class GetAndPostUser(Resource):
     
 @ns.route('/<idx>')
 class GetUpdateDeleteUser(Resource):
+    @ns.doc(security='Bearer Auth', parser=auth_header)
+    @jwt_required() # add this if you're using JWT for authentication
     def get(self,idx):
         # Get user object by user_id and exclude password field
         user = users.objects.exclude('password').get(user_id=idx)
@@ -94,7 +95,10 @@ class GetUpdateDeleteUser(Resource):
         user_json = json.loads(user.to_json())
         return jsonify(user_json)
     
-    @ns.expect(user_model)  # Use the 'expect' decorator to specify the expected payload
+    @ns.expect(user_model, auth_header) 
+    @ns.doc(security='Bearer Auth', parser=auth_header)
+    @jwt_required() # add this if you're using JWT for authentication
+     # Use the 'expect' decorator to specify the expected payload
     def put(self,idx):
         # Get request data from payload
         data = api.payload
@@ -115,7 +119,9 @@ class GetUpdateDeleteUser(Resource):
             user_json = json.loads(userwithoutpassword.to_json())
             return jsonify(user_json)
     
-    @ns.expect(password_model)  # Use the 'expect' decorator to specify the expected payload
+    @ns.expect(password_model, auth_header)  # Use the 'expect' decorator to specify the expected payload
+    @ns.doc(security='Bearer Auth', parser=auth_header)
+    @jwt_required() # add this if you're using JWT for authentication
     def delete(self, idx):
         # Get request data from payload
         data = api.payload
@@ -131,7 +137,9 @@ class GetUpdateDeleteUser(Resource):
     
 @ns.route('/<idx>/updatepassword')
 class UpdateUserpassword(Resource):
-    @ns.expect(update_password_model)  # Use the 'expect' decorator to specify the expected payload
+    @ns.expect(update_password_model, auth_header)  # Use the 'expect' decorator to specify the expected payload
+    @ns.doc(security='Bearer Auth', parser=auth_header)
+    @jwt_required() # add this if you're using JWT for authentication
     def put(self,idx):
         # Get request data from payload
         data=api.payload
@@ -211,28 +219,40 @@ class Login(Resource):
             access_token = create_access_token(identity=str(user.user_id))
             return {'access_token': access_token}, 200
 
-#BLOCKLIST = set()
 
 @ns.route('/signout')
 class SignOut(Resource):
+    @ns.doc(security='Bearer Auth', parser=auth_header)
     @jwt_required() # add this if you're using JWT for authentication
     def post(self):
         # Delete access token from client-side
-        #jti = get_jwt()['jti']
-        #BLOCKLIST.add(jti)
         # Return success message
         return {'message': 'Logged out successfully'}, 200
 
 #Creating a namespace for our API
-ns2 = api.namespace('courses', description='Courses')
+ns2 = api.namespace('courses', description='The courses namespace provides endpoints for managing courses, including creating, retrieving, updating, and deleting course information.')
+
+# Define the expected payload using the 'fields' module
+course_model = ns2.model('Course', {
+    'courseID': fields.String(required=True, description='enter your courseID'),
+    'title': fields.String(required=True, description='enter your title'),
+    'description': fields.String(required=True, description='enter your description'),
+    'credits': fields.Integer(required=True, description='enter your credits'),
+    'term': fields.String(required=True, description='enter your term')
+})
+
 
 #Defining endpoints for getting and posting courses
 @ns2.route('')
 class GetAndPost(Resource):
+    @ns2.doc(security='Bearer Auth', parser=auth_header)
+    @jwt_required() # add this if you're using JWT for authentication
     def get(self):
         return jsonify(courses.objects.all())
     
-    @ns2.expect(course_model)  # Use the 'expect' decorator to specify the expected payload
+    @ns2.expect(course_model, auth_header)  # Use the 'expect' decorator to specify the expected payload
+    @ns2.doc(security='Bearer Auth', parser=auth_header)
+    @jwt_required() # add this if you're using JWT for authentication
     def post(self):
         data=api.payload
         course=courses(courseID=data['courseID'],title=data['title'],description=data['description'],credits=data['credits'],term=data['term'])
@@ -242,15 +262,21 @@ class GetAndPost(Resource):
 #Defining endpoints for getting, updating and deleting courses by ID
 @ns2.route('/<idx>')
 class GetUpdateDelete(Resource):
+    @ns2.doc(security='Bearer Auth', parser=auth_header)
+    @jwt_required() # add this if you're using JWT for authentication
     def get(self,idx):
         return jsonify(courses.objects(courseID=idx))
     
-    @ns2.expect(course_model)  # Use the 'expect' decorator to specify the expected payload
+    @ns2.expect(course_model, auth_header)  # Use the 'expect' decorator to specify the expected payload
+    @ns2.doc(security='Bearer Auth', parser=auth_header)
+    @jwt_required() # add this if you're using JWT for authentication
     def put(self,idx):
         data=api.payload
         courses.objects(courseID=idx).update(**data)
         return jsonify(courses.objects(courseID=idx))
     
+    @ns2.doc(security='Bearer Auth', parser=auth_header)
+    @jwt_required() # add this if you're using JWT for authentication
     def delete(self,idx):
         courses.objects(courseID=idx).delete()
         return jsonify("Course is deleted!")
