@@ -32,9 +32,11 @@ class GetAndPostUser(Resource):
             token = serializer.dumps(emailid, salt='email-verification') 
             # create verification URL with token
             verification_url = f'http://localhost:8000/verify_email/{token}'
+            # Render the email template with the verify URL
+            html_body = render_template('verify_email.html', verify_url=verification_url, subject='Verify your account', button='VERIFY ACCOUNT',content='We are happy you signed up for Inxiteout. To start exploring Courses App, please confirm your email address.',caption='Didn’t create account')
             # create message and send email
             message = Message('Verify Your Email', recipients=[emailid])
-            message.body = f'Click the following link to verify your email: {verification_url}'
+            message.html = html_body
             mail.send(message)
             return {'message': 'Please click on the Verification Link Sent to mail'}, 200
         elif users.objects(email=data['email']).first():
@@ -119,9 +121,11 @@ class Reverify(Resource):
             token = serializer.dumps(emailid, salt='email-verification') 
             # create verification URL with token
             verification_url = f'http://localhost:8000/verify_email/{token}'
+            # Render the email template with the reverify URL
+            html_body = render_template('verify_email.html', verify_url=verification_url, subject='Verify your account',button='VERIFY ACCOUNT',content='We are happy you signed up for Inxiteout. To start exploring Courses App, please confirm your email address.',caption='Didn’t create account')
             # create message and send email
             message = Message('Verify Your Email', recipients=[emailid])
-            message.body = f'Click the following link to verify your email: {verification_url}'
+            message.html = html_body
             mail.send(message)
             return {'message': 'Please click on the Verification Link Sent to mail'}, 200
         
@@ -138,9 +142,11 @@ class ForgotPassword(Resource):
             token = serializer.dumps(data, salt='password-reset')
             # Create password reset URL with token
             reset_url = f'http://localhost:8000/reset_password/{token}'
+            # Render the email template with the reverify URL
+            html_body = render_template('verify_email.html', verify_url=reset_url, subject='Forgot your Password', button='RESET PASSWORD', content='We noticed that you have requested to reset your password for your Inxiteout account. To proceed with this request, please click on the password reset button below.', caption='Didn’t reset password')
             # Create message and send email
             message = Message('Reset Your Password', recipients=[data['email']])
-            message.body = f'Click the following link to reset your password: {reset_url}'
+            message.html = html_body
             mail.send(message)
             return {'message': 'Please check your email for password reset instructions'}, 200        
     
