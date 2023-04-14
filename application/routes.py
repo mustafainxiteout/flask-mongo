@@ -2,7 +2,7 @@
 from application import app,db,api,jwt,mail,serializer
 from flask import render_template, jsonify, json, redirect, flash, url_for, request
 from application.models import users,courses
-from flask_restx import Resource
+from flask_restx import Resource,fields
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from flask_jwt_extended import create_access_token,jwt_required,get_jwt
@@ -10,18 +10,58 @@ from flask_jwt_extended import create_access_token,jwt_required,get_jwt
 #Creating a namespace for our API
 ns = api.namespace('users', description='Users')
 
+# Define the expected payload using the 'fields' module
+user_model = ns.model('User', {
+    'name': fields.String(required=True, description='enter your name'),
+    'email': fields.String(required=True, description='enter your email id'),
+    'password': fields.String(required=True, description='enter your password')
+})
+
+login_model = ns.model('Login', {
+    'email': fields.String(required=True, description='enter your email id'),
+    'password': fields.String(required=True, description='enter your password')
+})
+
+password_model = ns.model('Password', {
+    'password': fields.String(required=True, description='enter your password')
+})
+
+forgot_password_model = ns.model('ForgotPassword', {
+    'email': fields.String(required=True, description='enter your email id'),
+    'new_password': fields.String(required=True, description='enter your new password')
+})
+
+update_password_model = ns.model('UpdatePassword', {
+    'old_password': fields.String(required=True, description='enter your old password'),
+    'new_password': fields.String(required=True, description='enter your new password')
+})
+
+reverify_model = ns.model('Reverify', {
+    'email': fields.String(required=True, description='enter your email id')
+})
+
+course_model = ns.model('Course', {
+    'courseID': fields.String(required=True, description='enter your courseID'),
+    'title': fields.String(required=True, description='enter your title'),
+    'description': fields.String(required=True, description='enter your description'),
+    'credits': fields.Integer(required=True, description='enter your credits'),
+    'term': fields.String(required=True, description='enter your term')
+})
+
+
 @ns.route('')
 class GetAndPostUser(Resource):
     def get(self):
         # Get all users and exclude password field
         return jsonify(users.objects.exclude('password','verified'))
     
+    @ns.expect(user_model)  # Use the 'expect' decorator to specify the expected payload
     def post(self):
         # Get request data from payload
         data=api.payload
         #increment user_id+1 and generate it automatically
-        userid=users.objects.count()
-        userid+=1
+        max_user_id = users.objects.aggregate({"$group": {"_id": None, "max_user_id": {"$max": "$user_id"}}}).next().get("max_user_id")
+        userid = max_user_id + 1
         if not users.objects(email=data['email']).first():
             # Create a new user and hash password and then send verification link to mail
             verified=False
@@ -53,7 +93,8 @@ class GetUpdateDeleteUser(Resource):
         # Serialize user object to JSON
         user_json = json.loads(user.to_json())
         return jsonify(user_json)
-
+    
+    @ns.expect(user_model)  # Use the 'expect' decorator to specify the expected payload
     def put(self,idx):
         # Get request data from payload
         data = api.payload
@@ -74,6 +115,7 @@ class GetUpdateDeleteUser(Resource):
             user_json = json.loads(userwithoutpassword.to_json())
             return jsonify(user_json)
     
+    @ns.expect(password_model)  # Use the 'expect' decorator to specify the expected payload
     def delete(self, idx):
         # Get request data from payload
         data = api.payload
@@ -89,6 +131,7 @@ class GetUpdateDeleteUser(Resource):
     
 @ns.route('/<idx>/updatepassword')
 class UpdateUserpassword(Resource):
+    @ns.expect(update_password_model)  # Use the 'expect' decorator to specify the expected payload
     def put(self,idx):
         # Get request data from payload
         data=api.payload
@@ -110,6 +153,7 @@ class UpdateUserpassword(Resource):
     
 @ns.route('/reverify')
 class Reverify(Resource):
+    @ns.expect(reverify_model)  # Use the 'expect' decorator to specify the expected payload
     def post(self):
         # Get request data from payload
         data=api.payload
@@ -131,6 +175,7 @@ class Reverify(Resource):
         
 @ns.route('/forgot_password')
 class ForgotPassword(Resource):
+    @ns.expect(forgot_password_model)  # Use the 'expect' decorator to specify the expected payload
     def post(self):
         # Get request data from payload
         data = api.payload
@@ -152,6 +197,7 @@ class ForgotPassword(Resource):
     
 @ns.route('/login')
 class Login(Resource):
+    @ns.expect(login_model)  # Use the 'expect' decorator to specify the expected payload
     def post(self):
         # Get request data from payload
         data=api.payload
@@ -186,6 +232,7 @@ class GetAndPost(Resource):
     def get(self):
         return jsonify(courses.objects.all())
     
+    @ns2.expect(course_model)  # Use the 'expect' decorator to specify the expected payload
     def post(self):
         data=api.payload
         course=courses(courseID=data['courseID'],title=data['title'],description=data['description'],credits=data['credits'],term=data['term'])
@@ -198,6 +245,7 @@ class GetUpdateDelete(Resource):
     def get(self,idx):
         return jsonify(courses.objects(courseID=idx))
     
+    @ns2.expect(course_model)  # Use the 'expect' decorator to specify the expected payload
     def put(self,idx):
         data=api.payload
         courses.objects(courseID=idx).update(**data)
