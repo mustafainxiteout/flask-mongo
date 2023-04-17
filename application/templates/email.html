@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{subject}}</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 18px;
+        background-color: #fff;
+		font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+      }
+      p {
+        margin: 0;
+        font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+        font-size: 16px;
+        color: #40507a;
+        line-height: 1.2;
+      }
+      h4 {
+        margin: 0;
+        font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+        font-size: 28px;
+        color: black;
+        line-height: 1.2;
+      }
+    </style>
+  </head>
+  <body>
+    <table cellpadding="0" cellspacing="0" border="0" align="center" width="100%" style="max-width: 600px;">
+      <tr>
+        <td align="center">
+          <table cellpadding="0" cellspacing="0" border="0" width="100%">
+            <tr>
+                <td align="center" style="padding: 20px 0;">
+                  <img src="https://inxiteout.ai/wp-content/uploads/2021/08/logo-14.png" height="70px" alt="My Image">
+                </td>
+            </tr>
+            <tr>
+              <td align="left" style="padding: 15px 0;">
+                <h4>{{subject}}</h4>
+              </td>
+            </tr>
+            <tr>
+              <td align="left" style="padding: 15px 0;">
+                <p>{{content}}</p>
+              </td>
+            </tr>
+            {% if url %}
+            <tr>
+              <td align="left" style="padding: 28px 0;">
+                <a href="{{url}}" style="background-color: #506bec; color: #fff; border-radius: 15px; padding: 15px 30px; text-decoration: none;">{{button}}</a>
+              </td>
+            </tr>
+            {% endif %}
+			<tr>
+				<td align="left" style="padding: 5px 0;">
+				  <p style="font-size: medium; font-weight: 700; padding-bottom: 3px;">Regards</p>
+                  {% if name %}
+                  <p style="font-size: small; padding-bottom: 2px;">{{name}}</p>
+                  {% endif %}
+                  <p style="font-size: small; padding-bottom: 2px;">{{company_name}}</p>
+                  {% if email_id %}
+                  <p style="font-size: small; padding-bottom: 2px;">Email: {{email_id}}</p>
+                  {% endif %}
+				</td>
+			</tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

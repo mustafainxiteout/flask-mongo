@@ -4,6 +4,11 @@ from flask import render_template, jsonify, json, redirect, flash, url_for, requ
 from application.models import users,courses
 from flask_restx import Resource,fields
 from flask_mail import Mail, Message
+from email.mime.base import MIMEBase
+from email import encoders
+import tempfile
+import os
+import mimetypes
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from flask_jwt_extended import create_access_token,jwt_required,get_jwt
 
@@ -280,6 +285,97 @@ class GetUpdateDelete(Resource):
     def delete(self,idx):
         courses.objects(courseID=idx).delete()
         return jsonify("Course is deleted!")
+    
+#Creating a namespace for our API
+email_ns = api.namespace('mail', description='Email related operations.')
+
+
+#Defining endpoints for sending mails
+@email_ns.route('')
+class GetAndPost(Resource):
+    @jwt_required() # add this if you're using JWT for authentication
+    def post(self):
+        # Get the email data from the request
+        email_data = request.form.to_dict()
+        
+        email_data['to'] = email_data['to'].split(',')
+        if 'cc' in email_data:
+            email_data['cc'] = email_data['cc'].split(',')
+
+
+        # Create the email message
+        msg = Message(
+            email_data['subject'],
+            recipients=email_data['to'],
+            cc=email_data.get('cc', None)
+            #bcc=[email_data.get('bcc', None)]
+        )
+
+        # Render the email template
+        html_body = render_template('email.html', subject=email_data['subject'], content=email_data['body'], name=email_data['name'],company_name=email_data['company_name'],email_id=email_data['sender_mail_id'],button=email_data['button'],url=email_data['url'])
+        msg.html = html_body
+        # Add attachments to the message object
+        attachments = request.files.getlist('attachments')
+        for attachment in attachments:
+            # Get the filename and content type
+            filename = attachment.filename
+            # Save the file in a temporary location
+            file_path = os.path.join(tempfile.gettempdir(), filename)
+            attachment.save(file_path)
+            # Set the attachment to the message object
+            with app.open_resource(file_path, 'rb') as fp:
+                msg.attach(filename, attachment.content_type, fp.read())
+
+
+        # Send the email
+        mail.send(msg)
+
+        return {'message': 'Email sent successfully'}, 200
+
+#Defining endpoints for sending bulk mails
+@email_ns.route('/send_bulk')
+class GetAndPost(Resource):
+    @jwt_required() # add this if you're using JWT for authentication
+    def post(self):
+        # Get the email data from the request
+        email_data = request.form.to_dict()
+        
+        email_data['to'] = email_data['to'].split(',')
+        if 'cc' in email_data:
+            email_data['cc'] = email_data['cc'].split(',')
+
+        # Add attachments to the message object
+        attachments = request.files.getlist('attachments')
+        msg_attachments = []
+        for attachment in attachments:
+            # Get the filename and content type
+            filename = attachment.filename
+            # Save the file in a temporary location
+            file_path = os.path.join(tempfile.gettempdir(), filename)
+            attachment.save(file_path)
+            # Set the attachment to the message object
+            with app.open_resource(file_path, 'rb') as fp:
+                msg_attachments.append((filename, attachment.content_type, fp.read()))
+
+        for email_recipient in email_data['to']:
+            # Create the email message
+            msg = Message(
+            email_data['subject'],
+            recipients=[email_recipient],
+            cc=email_data.get('cc', None)
+            #bcc=[email_data.get('bcc', None)]
+            )
+            # Render the email template
+            html_body = render_template('email.html', subject=email_data['subject'], content=email_data['body'], name=email_data['name'],company_name=email_data['company_name'],email_id=email_data['sender_mail_id'],button=email_data['button'],url=email_data['url'])
+            msg.html = html_body
+            # Attach the files to the message object
+            for attachment in msg_attachments:
+                msg.attach(*attachment)
+            # Send the email
+            mail.send(msg)
+
+        return {'message': 'Bulk Email sent successfully'}, 200
+
     
 #Defining the route for the index page
 @app.route("/")
