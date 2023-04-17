@@ -161,12 +161,12 @@ To send bulk emails, send a POST request to the mail/send_bulk endpoint with the
 - `cc` (optional) - a comma-separated list of email addresses to carbon copy.
 - `subject` - the subject of the email.
 - `body` - the content of the email.
-- `name` - the name of the recipient.
+- `name` (optional) - the name of the recipient.
 - `company_name` - the name of the recipient's company.
-- `sender_mail_id` - the sender's email address.
-- `button` - the text to display on the button in the email.
-- `url` - the URL to link the button to.
-- `attachments` - the files to be attached in the mail.
+- `sender_mail_id` (optional) - the sender's email address.
+- `button` (optional) - the text to display on the button in the email.
+- `url` (optional) - the URL to link the button to.
+- `attachments` (optional) - the files to be attached in the mail.
 
 ![bulk email form data](https://github.com/mustafainxiteout/flask-mongo/blob/master/bulk%20mail%20form.png?raw=true)
 
