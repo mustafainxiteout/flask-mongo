@@ -49,10 +49,12 @@ flask run
 ## Features
 This application includes the following features:
 
-- MongoDB integration for data storage
-- Flask-RESTX for building a RESTful API
-- CRUD operations for managing data
-- User Authentication and Hashing Password through Restful API
+-User authentication with Flask-JWT-Extended and hashing password through Restful API
+-CRUD operations for managing data
+-MongoDB integration for data storage
+-Flask-RESTX for building a RESTful API
+-Email verification for new user registration
+-Password reset email functionality using Flask-Mail and Mailtrap.io
 
 ## File Structure
 The file structure of this application is as follows:
