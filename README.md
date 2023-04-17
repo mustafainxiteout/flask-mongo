@@ -1,4 +1,3 @@
-
 # Flask with MongoDB and Flask-RESTX using a Virtual Environment
 
 This is a simple Flask application that uses MongoDB for data storage and Flask-RESTX for building a RESTful API. The application is built using a virtual environment and can be easily installed using pip.
@@ -86,7 +85,23 @@ The file structure of this application is as follows:
 - `courses.json` contains courses data to import in mongodb
 - `users.json` contains users data to import in mongodb and password of it is hashed and stored in it. For the attached one, The password is `12345678`.
 
-## Sending Verification and Reset Password Mails via Mailtrap.io
+## Authentication
+
+To access the API endpoints that require authentication, send a POST request to /users/login with a JSON payload containing a valid email_id and password. The API will return a JSON Web Token (JWT) that must be included in the headers of all subsequent requests to authenticated endpoints, using the Authorization: Bearer <JWT> format.
+
+## Hashing Passwords
+
+The API uses the Werkzeug generate_password_hash function to hash passwords before storing them in the database. To check if a password matches the hashed version, use the check_password_hash function.
+
+## Forgot Password
+
+If a user forgets their password, they can reset it using the /users/forgot_password endpoint. This will send new_password reset with email to the user's email address. The user can then click the link in the email to change to their new password.
+
+## Email Verification
+
+When a new user registers, they will receive an email verification email at the email address they provided during registration. They must click the link in this email to verify their account before they can log in.
+
+## Sending Mails via Mailtrap.io
 
 Mailtrap.io is a cloud-based fake SMTP server that allows software developers and testers to test and preview their email notifications without sending them to real users. It intercepts emails sent from development and staging environments and stores them in a test inbox for review. This allows developers to test the functionality of their email notifications in a safe environment, without risking the delivery of test emails to real users or spamming their inboxes. Mailtrap.io supports a variety of programming languages, frameworks, and tools, including Flask-Mail.
 
@@ -139,3 +154,7 @@ After creating the message object, you can send the email using the send method 
 mail.send(msg)
 ```
 The email will then be sent to your Mailtrap.io inbox, where you can view and test it.
+
+### Troubleshooting
+
+If you are having trouble receiving emails in Mailtrap.io, make sure your SMTP credentials are correct and that you have set up your Mailtrap.io inbox correctly. If you are still having issues, check the Mailtrap.io documentation or contact their support team.
