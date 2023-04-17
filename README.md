@@ -158,3 +158,5 @@ The email will then be sent to your Mailtrap.io inbox, where you can view and te
 ### Troubleshooting
 
 If you are having trouble receiving emails in Mailtrap.io, make sure your SMTP credentials are correct and that you have set up your Mailtrap.io inbox correctly. If you are still having issues, check the Mailtrap.io documentation or contact their support team.
+
+![bulk email form data][https://github.com/mustafainxiteout/flask-mongo/blob/master/bulk%20mail%20form.png]
